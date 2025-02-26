@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // Funzione per controllare se l'utente è autenticato
 async function isAuthenticated() {
-  const token = LocalStorage.getItem("jwt");
+  const token = sessionStorage.getItem("jwt");
   if (!token) {
       return false;
   }
