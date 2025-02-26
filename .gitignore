@@ -1,0 +1,14 @@
+
+# CLIENT
+
+
+# SERVER
+bin/
+obj/
+.vs/
+*.user
+*.csproj
+*.sln
+*.http
+*.json
+
