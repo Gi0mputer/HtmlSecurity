@@ -27,7 +27,7 @@ namespace AutenticationServer.Controllers
                 {
                     Subject = new ClaimsIdentity(new Claim[]
                     {
-                        new Claim(ClaimTypes.Name, user.Username)
+                new Claim(ClaimTypes.Name, user.Username)
                     }),
                     Expires = DateTime.UtcNow.AddHours(1),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -36,72 +36,50 @@ namespace AutenticationServer.Controllers
                 var token = tokenHandler.CreateToken(tokenDescriptor);
                 var tokenString = tokenHandler.WriteToken(token);
 
-                // Imposta il token in un cookie HttpOnly
-                Response.Cookies.Append("auth_token", tokenString, new CookieOptions
-                {
-                    HttpOnly = true,           // Non accessibile da JavaScript
-                    Secure = false,             // con true Invia il cookie solo su HTTPS
-                    SameSite = SameSiteMode.None, // o Strict
-                    Expires = DateTime.UtcNow.AddHours(1)
-                });
-
-
-                //In ambienti di produzione la prassi più sicura è avere il client e il server(o l'autenticatore)
-                //configurati per operare sullo stesso dominio o, in alternativa, impostare correttamente il dominio del cookie.
-                //Nel caso in cui l'autenticatore giri su un dominio diverso da quello in cui sono ospitate le pagine
-                //(ad esempio, API su "api.example.com" e client su "www.example.com"),
-                //occorre configurare i cookie(ad esempio, impostando il parametro Domain)
-                //e scegliere opportunamente il valore di SameSite per permettere la trasmissione dei cookie nelle richieste cross - domain.
-
-                // PER LO SVILUPPO
-                //spesso si rilassano temporaneamente le restrizioni(disabilitando Secure e usando SameSite = Lax)
-                //per facilitare il testing,
-
-                // IN PRODUZIONE
-                //è preferibile usare HTTPS e impostazioni più restrittive per aumentare la sicurezza.
-                // Viene restituito un messaggio di conferma senza includere il token nel body (l’autenticazione avviene tramite il cookie).
-                //
-
-                return Ok(new { message = "Login riuscito!" });
+                // NON impostiamo più un cookie, ma restituiamo il token nel body della risposta.
+                return Ok(new { token = tokenString });
             }
 
             return Unauthorized();
         }
 
-        // Endpoint per il check dell'autenticazione
         [HttpGet("check")]
         public IActionResult CheckAuth()
         {
-            // Legge il cookie "auth_token"
-            if (Request.Cookies.TryGetValue("auth_token", out var token))
-            {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(_secretKey);
-                try
-                {
-                    // Validazione del token
-                    tokenHandler.ValidateToken(token, new TokenValidationParameters
-                    {
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key)
-                    }, out SecurityToken validatedToken);
-
-                    return Ok(new { message = "Token valido" });
-                }
-                catch (Exception ex)
-                {
-                    // In caso di errore (token scaduto o alterato)
-                    return Unauthorized(new { message = "Token non valido", error = ex.Message });
-                }
-            }
-            else
+            if (!Request.Headers.ContainsKey("Authorization"))
             {
                 return Unauthorized(new { message = "Token mancante" });
             }
+
+            string authHeader = Request.Headers["Authorization"];
+            if (!authHeader.StartsWith("Bearer "))
+            {
+                return Unauthorized(new { message = "Formato del token non valido" });
+            }
+
+            string token = authHeader.Substring("Bearer ".Length).Trim();
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_secretKey);
+            try
+            {
+                var claimsPrincipal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                }, out SecurityToken validatedToken);
+
+                return Ok(new { message = "Token valido" });
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized(new { message = "Token non valido", error = ex.Message });
+            }
         }
+
     }
 
     public class UserLogin
