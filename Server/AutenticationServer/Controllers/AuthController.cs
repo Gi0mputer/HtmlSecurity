@@ -60,7 +60,7 @@ namespace AutenticationServer.Controllers
                 // IN PRODUZIONE
                 //è preferibile usare HTTPS e impostazioni più restrittive per aumentare la sicurezza.
                 // Viene restituito un messaggio di conferma senza includere il token nel body (l’autenticazione avviene tramite il cookie).
-
+                //
 
                 return Ok(new { message = "Login riuscito!" });
             }
