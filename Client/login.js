@@ -18,10 +18,9 @@ async function handleLogin() {
     });
 
     if (response.ok) {
-      
+
       const data = await response.json();
       sessionStorage.setItem("jwt", data.token); // Salva il token nel localStorage
-      alert("Login riuscito!");
       const redirectPage = sessionStorage.getItem("redirectPage") || "/Client/page1.html";
       sessionStorage.removeItem("redirectPage");
       window.location.href = redirectPage;

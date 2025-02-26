@@ -1,22 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
+    <script src="/Client/auth.js"></script>
     <meta charset="UTF-8">
-    <title>Autonomous Snake Game with Enhanced Features</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagina 3 - Area Protetta</title>
     <style>
-        html, body {
+        /* Reset CSS */
+        * {
+            padding: 0;
             margin: 0;
-            height: 100%;
-            overflow: hidden;
-            background-color: black;
+            box-sizing: border-box;
         }
+
+        /* Stile generale */
+        body {
+            background-color: #080710;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            z-index: 2;
+        }
+        
         canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;  
+            height: 100vh; 
+            z-index: 1;
+        }
+
+        h2 {
+            color: #fde3af;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #fde3af;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        a {
             display: block;
-            background-color: black;
+            color: #fde3af;
+            font-size: 22px;
+            font-weight: bold;
+            margin: 10px 0;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #ffcc66;
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h2>Pagina 3 - Contenuto Riservato</h2>
+        <p>Solo gli utenti autenticati possono vedere questa pagina.</p>
+        <a href="/Client/page1.html">Torna alla Pagina 1</a><br>
+        <a href="/Client/page2.html">Vai alla Pagina 3</a><br>
+    </div>
     <canvas id="gameCanvas"></canvas>
     <script>
         // Get the canvas and context
